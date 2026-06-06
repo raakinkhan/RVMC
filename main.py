@@ -9,6 +9,8 @@
 
 import re
 from playwright.sync_api import sync_playwright
+import Reader
+
 
 with sync_playwright() as p:
     browser = p.chromium.launch(channel="chrome", headless=False)
@@ -31,6 +33,7 @@ with sync_playwright() as p:
                 exam_obj.click()
                 individual = username
                 marks = page.locator('//*[@id="main-content"]/div/div/div[3]/main/div[2]/div/div[2]/span[1]').text_content()
+                # return (individual, marks) ###
                 print(individual, marks)
             else:
                 print("Marks not published")
@@ -64,5 +67,10 @@ with sync_playwright() as p:
             else:
                 dashboard_entering()
 
-    get_indiviual(username="[password-here]")  
+    student_data = Reader.Read()
+    for idx in student_data:
+        get_indiviual(username=str(idx))
+    # get_indiviual(username="250103")
+
+
 
