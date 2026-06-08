@@ -15,17 +15,39 @@ import Reader
 with sync_playwright() as p:
     browser = p.chromium.launch(channel="chrome", headless=False)
     page = browser.new_page()
+    student_data = Reader.Read()
 
     def get_indiviual(username, exam_type="kcet", exam_name="II PU WEEKLY TEST 09 (KCET 03)"):
         def dashboard_entering():
-            page.get_by_text("Course Code : 2JMCourse Title").click()
+            jm2 = page.locator(".card-body").filter(
+                has_text="Course Code : 2JM"
+            ).filter(has_text="Active")
+            jm2.click()
+
+            page.wait_for_timeout(1000)
+            #  why 2 times? i checked that the website has one rare bug, it throws u back to the same page twice
+            jm2 = page.locator(".card-body").filter(
+                has_text="Course Code : 2JM"
+            ).filter(has_text="Active")
+            if jm2.is_visible():
+                jm2.click()
 
             page.get_by_text("Test Performance", exact=True).click()
 
             if exam_type == "kcet":
-                page.locator("div").filter(has_text=re.compile(r"^KCET$")).nth(1).click()
+                kcet = page.get_by_role("heading", name="KCET")
+                page.wait_for_timeout(1000)
+                if kcet.is_visible():
+                    kcet.click()
+                else:
+                    print("can't find kcet")
             else:
-                page.locator("div").filter(has_text=re.compile(r"^JEE Main$")).nth(1)
+                jee = page.get_by_role("heading", name="JEE Main")
+                page.wait_for_timeout(1000)
+                if jee.is_visible():
+                    jee.click()
+                else:
+                    print("can't find jee")
 
             exam_obj = page.get_by_role("heading", name=exam_name)
             page.wait_for_timeout(2000)
@@ -34,7 +56,9 @@ with sync_playwright() as p:
                 individual = username
                 marks = page.locator('//*[@id="main-content"]/div/div/div[3]/main/div[2]/div/div[2]/span[1]').text_content()
                 # return (individual, marks) ###
-                print(individual, marks)
+                print(student_data[int(individual)][0], marks, )
+                page.wait_for_timeout(1000)
+
             else:
                 print("Marks not published")
 
@@ -42,6 +66,7 @@ with sync_playwright() as p:
             password = username
             if parents:
                 username += "_p"
+
 
             page.get_by_placeholder("Username").fill(username)
             # password input
@@ -61,16 +86,20 @@ with sync_playwright() as p:
             print("password changed")
             login_page_entering(parents=True, username=username)
             page.wait_for_timeout(1000)
+            dashboard_entering()
+            page.wait_for_timeout(1000)
 
             if page.get_by_text("Incorrect User Name or").is_visible():
                 print("The person has changed both account password")
             else:
                 dashboard_entering()
 
-    student_data = Reader.Read()
-    for idx in student_data:
-        get_indiviual(username=str(idx))
-    # get_indiviual(username="250103")
+
+    for _, idx in enumerate(student_data):
+        get_indiviual(username=str(idx), exam_type="jee", exam_name="II PU WEEKLY TEST 10 (JEE MAIN)")
+        # if _ >= 11:
+        #     get_indiviual(username=str(idx))
+    # get_indiviual(username="250885")
 
 
 

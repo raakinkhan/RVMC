@@ -12,3 +12,4 @@ def Read(file="2E SEC SEATING.xlsx") -> dict:
             marks_dict[std_id] = [student_name[_],]
     return marks_dict
 
+print(Read())
