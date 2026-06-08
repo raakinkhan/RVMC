@@ -21,6 +21,8 @@ with sync_playwright() as p:
     def get_indiviual(username, exam_type="kcet", exam_name="II PU WEEKLY TEST 09 (KCET 03)"):
         browser = p.chromium.launch(channel="chrome", headless=False)
         page = browser.new_page()
+        page.set_default_timeout(7000)
+        page.set_default_navigation_timeout(7000)
         try:
 
             def dashboard_entering():
@@ -107,9 +109,9 @@ with sync_playwright() as p:
 
 
     for _, idx in enumerate(student_data):
-        get_indiviual(username=str(idx), exam_type="jee", exam_name="II PU WEEKLY TEST 10 (JEE MAIN)")
-        # if _ >= 11:
-        #     get_indiviual(username=str(idx))
+        # get_indiviual(username=str(idx))
+        if _ >= 11:
+            get_indiviual(username=str(idx))
     # get_indiviual(username="251689", exam_type="jee", exam_name="II PU WEEKLY TEST 10 (JEE MAIN)")
 
 
